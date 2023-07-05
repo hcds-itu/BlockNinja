@@ -7,8 +7,8 @@ Demo: <code><a href="https://jeherillajanwar.github.io/BlockNinja/">https://jehe
 
 Connect with gcloud backend
 
-Records score and send to gcloud along with metadata
+Record score and send to gcloud along with metadata
 
-Redirection to questionaire page
+Redirection to questionnaire page
 
 Look into possibility of background change
