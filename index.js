@@ -1,6 +1,6 @@
 // This is the user data
-var userPerformance = {}
-var url = "https://flask-mobile-392108.ey.r.appspot.com"
+const url = "https://flask-mobile-392108.ey.r.appspot.com"
+const { addData, removeData } = require('./network.js');
 
 // globalConfig.js
 // Provides global variables used by the entire program.
@@ -118,7 +118,9 @@ const state = {
 		// Player score.
 		score: 0,
 		// Total number of cubes smashed in game.
-		cubeCount: 0
+		cubeCount: 0,
+		// The number of times player has played in session
+		sessionTry: 0
 	},
 	menus: {
 		// Set to `null` to hide all menus
@@ -1386,24 +1388,28 @@ function resumeGame() {
 }
 
 function endGame() {
-	console.log("Game has ended!!");
-	userPerformance["score"] = state.game.score;
-	userPerformance["high"] = isNewHighScore();
+	// Save this data
+	console.log("Game has ended:)");
+	const sessionScore = state.game.score;
+	const highScore = isNewHighScore()
+	const sessionTry = state.game.sessionTry;
+	addData(["score", "try", "high"], [sessionScore, sessionTry, highScore])
+
+	state.game.sessionTry += 1;
+
 	handleCanvasPointerUp();
 	if (isNewHighScore()) {
 		setHighScore(state.game.score);
 	}
-	setActiveMenu(MENU_SCORE);
 
-	fetch(url + "/store_data", {
-		method: "POST",
-		headers: {},
-		body: JSON.stringify(userPerformance)
-	})
-   .then(response => response.json())
-   .then(response => console.log(JSON.stringify(response)))
-
-   userPerformance = {}
+	// let user have a retry or go to questions
+	if (state.game.sessionTry < 5) {
+		console.log("%d tries left", (5-state.game.sessionTry));
+		setActiveMenu(MENU_SCORE);
+	} else {
+		// window.location.href = "question.html";
+		setActiveMenu(MENU_SCORE);
+	}
 }
 
 ////////////////////////
