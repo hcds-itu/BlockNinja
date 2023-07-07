@@ -1,3 +1,7 @@
+// This is the user data
+var userPerformance = {}
+var url = "https://flask-mobile-392108.ey.r.appspot.com"
+
 // globalConfig.js
 // Provides global variables used by the entire program.
 // Most of this should be configuration.
@@ -1382,11 +1386,24 @@ function resumeGame() {
 }
 
 function endGame() {
+	console.log("Game has ended!!");
+	userPerformance["score"] = state.game.score;
+	userPerformance["high"] = isNewHighScore();
 	handleCanvasPointerUp();
 	if (isNewHighScore()) {
 		setHighScore(state.game.score);
 	}
 	setActiveMenu(MENU_SCORE);
+
+	fetch(url + "/store_data", {
+		method: "POST",
+		headers: {},
+		body: JSON.stringify(userPerformance)
+	})
+   .then(response => response.json())
+   .then(response => console.log(JSON.stringify(response)))
+
+   userPerformance = {}
 }
 
 ////////////////////////
