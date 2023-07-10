@@ -1,7 +1,8 @@
 import './styles.css';
 // This is the user data
-const url = "https://flask-mobile-392108.ey.r.appspot.com"
+const url = "https://flask-mobile-392108.ey.r.appspot.com";
 const network = require('./network.js');
+new network.JsonData();
 
 // globalConfig.js
 // Provides global variables used by the entire program.
@@ -1392,9 +1393,6 @@ function endGame() {
 	// Save this data
 	console.log("Game has ended:)");
 	const sessionScore = state.game.score;
-	const highScore = isNewHighScore()
-	const sessionTry = state.game.sessionTry;
-	network.addData(["score", "try", "high"], [sessionScore, sessionTry, highScore])
 
 	state.game.sessionTry += 1;
 
@@ -1402,12 +1400,13 @@ function endGame() {
 	if (isNewHighScore()) {
 		setHighScore(state.game.score);
 	}
-
+	network.JsonData.addData(["score", "high"], [sessionScore, isNewHighScore()]);
 	// let user have a retry or go to questions
-	if (state.game.sessionTry < 1) {
-		console.log("%d tries left", (1-state.game.sessionTry));
+	if (state.game.sessionTry < 3) {
+		console.log("%d tries left", (3-state.game.sessionTry));
 		setActiveMenu(MENU_SCORE);
 	} else {
+		network.JsonData.storeData(url);
 		window.location.href = "question.html";
 	}
 }
