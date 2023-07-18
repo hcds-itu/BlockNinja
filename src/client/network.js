@@ -3,17 +3,18 @@ class JsonData {
     static jsonObj
 
     constructor() {
-        this.jsonObj = {};
+        JsonData.jsonObj = {};
     }
 
     static addData(keys, values) {
-        for (let i = 0; i < keys.Length; i++) {
+        console.log(keys.length);
+        for (let i = 0; i < keys.length; i++) {
             let key = keys[i];
-            if (this.jsonObj.hasOwnProperty(key)) {
-                this.jsonObj[key].push(values[i]);
+            if (JsonData.jsonObj.hasOwnProperty(key)) {
+                JsonData.jsonObj[key].push(values[i]);
             }
             else {
-                this.jsonObj[key] = [];
+                JsonData.jsonObj[key] = [values[i]];
             }
         }
     }
@@ -25,11 +26,7 @@ class JsonData {
     static storeData(url) {
         fetch(url + "/store_data", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin" : url
-            },
-            body: this.jsonObj
+            body: JsonData.jsonObj
         })
        .then(response => response.json())
        .then(response => console.log(JSON.stringify(response)))

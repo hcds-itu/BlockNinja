@@ -1,8 +1,9 @@
 import './styles.css';
 // This is the user data
-const url = "https://flask-mobile-392108.ey.r.appspot.com";
+const url = "https://flask-vr.ew.r.appspot.com";
 const network = require('./network.js');
-new network.JsonData();
+const jsonData = new network.JsonData();
+jsonData.jsonObj = {}
 
 // globalConfig.js
 // Provides global variables used by the entire program.
@@ -1401,6 +1402,7 @@ function endGame() {
 		setHighScore(state.game.score);
 	}
 	network.JsonData.addData(["score", "high"], [sessionScore, isNewHighScore()]);
+	console.log(JSON.stringify(network.JsonData.jsonObj));
 	// let user have a retry or go to questions
 	if (state.game.sessionTry < 3) {
 		console.log("%d tries left", (3-state.game.sessionTry));
