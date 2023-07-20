@@ -26,7 +26,7 @@ class JsonData {
     static storeData(url) {
         fetch(url + "/store_data", {
             method: "POST",
-            body: JsonData.jsonObj
+            body: JSON.stringify(JsonData.jsonObj)
         })
        .then(response => response.json())
        .then(response => console.log(JSON.stringify(response)))

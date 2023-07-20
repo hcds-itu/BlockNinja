@@ -1,7 +1,7 @@
 import './styles.css';
 // This is the user data
-const url = "https://flask-vr.ew.r.appspot.com";
-const network = require('./network.js');
+const url = "https://flask-bninja.ey.r.appspot.com";
+const network = require("./network.js");
 const jsonData = new network.JsonData();
 jsonData.jsonObj = {}
 
@@ -21,8 +21,8 @@ const allColors = [BLUE, GREEN, PINK, ORANGE];
 
 // Gameplay
 const getSpawnDelay = () => {
-	const spawnDelayMax = 1400;
-	const spawnDelayMin = 550;
+	const spawnDelayMax = 900;
+	const spawnDelayMin = 400;
 	const spawnDelay = spawnDelayMax - state.game.cubeCount * 3.1;
 	return Math.max(spawnDelay, spawnDelayMin);
 }
@@ -159,6 +159,11 @@ const setHighScore = score => {
 };
 
 const isNewHighScore = () => state.game.score > _lastHighscore;
+
+window.addEventListener('beforeunload', function(event) {
+	localStorage.removeItem(highScoreKey);
+});
+  
 
 
 /////////
@@ -1392,7 +1397,7 @@ function resumeGame() {
 
 function endGame() {
 	// Save this data
-	console.log("Game has ended:)");
+	console.log("Game has ended:) " +  _lastHighscore);
 	const sessionScore = state.game.score;
 
 	state.game.sessionTry += 1;
@@ -1404,12 +1409,14 @@ function endGame() {
 	network.JsonData.addData(["score", "high"], [sessionScore, isNewHighScore()]);
 	console.log(JSON.stringify(network.JsonData.jsonObj));
 	// let user have a retry or go to questions
-	if (state.game.sessionTry < 3) {
-		console.log("%d tries left", (3-state.game.sessionTry));
+	if (state.game.sessionTry < 2) {
+		console.log("%d tries left", (2-state.game.sessionTry));
 		setActiveMenu(MENU_SCORE);
 	} else {
-		network.JsonData.storeData(url);
-		window.location.href = "question.html";
+		// network.JsonData.storeData(url);
+		localStorage.removeItem(highScoreKey);
+		const encodedJsonData = encodeURIComponent(JSON.stringify(jsonData));
+		window.location.href = "question.html?data=" + encodedJsonData;
 	}
 }
 
@@ -1611,7 +1618,7 @@ function tick(width, height, simTime, simSpeed, lag) {
 						incrementScore(10);
 
 						if (target.health <= 0) {
-							incrementCubeCount(1);
+							incrementCubeCount(2);
 							createBurst(target, forceMultiplier);
 							sparkBurst(hitX, hitY, 8, sparkSpeed);
 							if (target.wireframe) {

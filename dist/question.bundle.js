@@ -15,7 +15,7 @@
   \*******************************/
 /***/ ((module) => {
 
-eval("\nclass JsonData {\n    static jsonObj\n\n    constructor() {\n        JsonData.jsonObj = {};\n    }\n\n    static addData(keys, values) {\n        console.log(keys.length);\n        for (let i = 0; i < keys.length; i++) {\n            let key = keys[i];\n            if (JsonData.jsonObj.hasOwnProperty(key)) {\n                console.log(\"hej\")\n                JsonData.jsonObj[key].push(values[i]);\n            }\n            else {\n                console.log(\"her\")\n                JsonData.jsonObj[key] = [values[i]];\n            }\n        }\n    }\n\n    static removeData() { \n        this.jsonObj = {}\n    }\n\n    static storeData(url) {\n        fetch(url + \"/store_data\", {\n            method: \"POST\",\n            body: JsonData.jsonObj\n        })\n       .then(response => response.json())\n       .then(response => console.log(JSON.stringify(response)))\n    }   \n}\n\nmodule.exports = {\n    JsonData\n};\n\n//# sourceURL=webpack://blockninja/./src/client/network.js?");
+eval("\nclass JsonData {\n    static jsonObj\n\n    constructor() {\n        JsonData.jsonObj = {};\n    }\n\n    static addData(keys, values) {\n        console.log(keys.length);\n        for (let i = 0; i < keys.length; i++) {\n            let key = keys[i];\n            if (JsonData.jsonObj.hasOwnProperty(key)) {\n                JsonData.jsonObj[key].push(values[i]);\n            }\n            else {\n                JsonData.jsonObj[key] = [values[i]];\n            }\n        }\n    }\n\n    static removeData() { \n        this.jsonObj = {}\n    }\n\n    static storeData(url) {\n        fetch(url + \"/store_data\", {\n            method: \"POST\",\n            body: JSON.stringify(JsonData.jsonObj)\n        })\n       .then(response => response.json())\n       .then(response => console.log(JSON.stringify(response)))\n    }   \n}\n\nmodule.exports = {\n    JsonData\n};\n\n//# sourceURL=webpack://blockninja/./src/client/network.js?");
 
 /***/ }),
 
@@ -25,7 +25,7 @@ eval("\nclass JsonData {\n    static jsonObj\n\n    constructor() {\n        Jso
   \********************************/
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
-eval("const network = __webpack_require__(/*! ./network */ \"./src/client/network.js\");\n\nconsole.log(JSON.stringify(network.JsonData.jsonObj));\n\n//# sourceURL=webpack://blockninja/./src/client/question.js?");
+eval("const network = __webpack_require__(/*! ./network */ \"./src/client/network.js\");\nconst jsonData = new network.JsonData();\n\nconst urlParams = new URLSearchParams(window.location.search);\nconst encodedJsonData = urlParams.get(\"data\");\nconst decodedJsonString = decodeURIComponent(encodedJsonData);\nconst data = JSON.parse(decodedJsonString);\n\njsonData.jsonObj = data\n\nconsole.log(JSON.stringify(data));\n\n//# sourceURL=webpack://blockninja/./src/client/question.js?");
 
 /***/ })
 
