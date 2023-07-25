@@ -1,3 +1,5 @@
+import './question.css';
+
 const network = require('./network');
 const jsonData = new network.JsonData();
 
@@ -8,4 +10,5 @@ const data = JSON.parse(decodedJsonString);
 
 jsonData.jsonObj = data
 
+console.log(encodedJsonData)
 console.log(JSON.stringify(data));

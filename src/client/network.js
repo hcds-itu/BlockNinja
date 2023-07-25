@@ -7,15 +7,19 @@ class JsonData {
     }
 
     static addData(keys, values) {
-        console.log(keys.length);
-        for (let i = 0; i < keys.length; i++) {
+        // set first indicators
+        let keyColor = values[0];
+        let gameTry = values[1].toString();
+        if (!JsonData.jsonObj.hasOwnProperty(keyColor)) {
+            JsonData.jsonObj[keyColor] = {}
+        }
+        if (!JsonData.jsonObj[keyColor].hasOwnProperty(gameTry)) {
+            JsonData.jsonObj[keyColor][gameTry] = {}
+        }
+        
+        for (let i = 2; i < keys.length; i++) {
             let key = keys[i];
-            if (JsonData.jsonObj.hasOwnProperty(key)) {
-                JsonData.jsonObj[key].push(values[i]);
-            }
-            else {
-                JsonData.jsonObj[key] = [values[i]];
-            }
+            JsonData.jsonObj[keyColor][gameTry][key] = values[i];
         }
     }
 

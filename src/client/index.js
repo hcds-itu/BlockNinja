@@ -3,7 +3,21 @@ import './styles.css';
 const url = "https://flask-bninja.ey.r.appspot.com";
 const network = require("./network.js");
 const jsonData = new network.JsonData();
-jsonData.jsonObj = {}
+jsonData.jsonObj = {};
+
+// background color
+
+const bgColors = ["red","blue"];
+const firstColor = Math.floor(Math.random() * 2.001);
+const secondColor = 1 - firstColor;
+
+let currColor = firstColor
+
+document.body.style.backgroundColor = bgColors[currColor];
+
+let startTime;
+let endTime;
+let timeSpent;
 
 // globalConfig.js
 // Provides global variables used by the entire program.
@@ -100,11 +114,9 @@ const allShadowPolys = [];
 
 // Game Modes
 const GAME_MODE_RANKED = Symbol('GAME_MODE_RANKED');
-const GAME_MODE_CASUAL = Symbol('GAME_MODE_CASUAL');
 
 // Available Menus
 const MENU_MAIN = Symbol('MENU_MAIN');
-const MENU_PAUSE = Symbol('MENU_PAUSE');
 const MENU_SCORE = Symbol('MENU_SCORE');
 
 
@@ -138,8 +150,6 @@ const state = {
 
 const isInGame = () => !state.menus.active;
 const isMenuVisible = () => !!state.menus.active;
-const isCasualGame = () => state.game.mode === GAME_MODE_CASUAL;
-const isPaused = () => state.menus.active === MENU_PAUSE;
 
 
 ///////////////////
@@ -149,7 +159,7 @@ const isPaused = () => state.menus.active === MENU_PAUSE;
 const highScoreKey = '__menja__highScore';
 const getHighScore = () => {
 	const raw = localStorage.getItem(highScoreKey);
-	return raw ? parseInt(raw, 10) : 0;
+	return raw ? parseInt(raw, 10) : -1;
 };
 
 let _lastHighscore = getHighScore();
@@ -1176,29 +1186,11 @@ function setHudVisibility(visible) {
 ///////////
 // Score //
 ///////////
-const scoreNode = $('.score-lbl');
-const cubeCountNode = $('.cube-count-lbl');
-
-function renderScoreHud() {
-	if (isCasualGame()) {
-		scoreNode.style.display = 'none';
-		cubeCountNode.style.opacity = 1;
-	} else {
-		scoreNode.innerText = `SCORE: ${state.game.score}`;
-		scoreNode.style.display = 'block';
-		cubeCountNode.style.opacity = 0.65 ;
-	}
-	cubeCountNode.innerText = `CUBES SMASHED: ${state.game.cubeCount}`;
-}
-
-renderScoreHud();
 
 
 //////////////////
 // Pause Button //
 //////////////////
-
-handlePointerDown($('.pause-btn'), () => pauseGame());
 
 
 ////////////////////
@@ -1217,12 +1209,7 @@ function renderSlowmoStatus(percentRemaining) {
 // Top-level menu containers
 const menuContainerNode = $('.menus');
 const menuMainNode = $('.menu--main');
-const menuPauseNode = $('.menu--pause');
 const menuScoreNode = $('.menu--score');
-
-const finalScoreLblNode = $('.final-score-lbl');
-const highScoreLblNode = $('.high-score-lbl');
-
 
 
 function showMenu(node) {
@@ -1235,23 +1222,13 @@ function hideMenu(node) {
 
 function renderMenus() {
 	hideMenu(menuMainNode);
-	hideMenu(menuPauseNode);
 	hideMenu(menuScoreNode);
 
 	switch (state.menus.active) {
 		case MENU_MAIN:
 			showMenu(menuMainNode);
 			break;
-		case MENU_PAUSE:
-			showMenu(menuPauseNode);
-			break;
 		case MENU_SCORE:
-			finalScoreLblNode.textContent = formatNumber(state.game.score);
-			if (isNewHighScore()) {
-				highScoreLblNode.textContent = 'New High Score!';
-			} else {
-				highScoreLblNode.textContent = `High Score: ${formatNumber(getHighScore())}`;
-			}
 			showMenu(menuScoreNode);
 			break;
 	}
@@ -1271,28 +1248,18 @@ renderMenus();
 
 // Main Menu
 handleClick($('.play-normal-btn'), () => {
+	startTime = performance.now()
 	setGameMode(GAME_MODE_RANKED);
 	setActiveMenu(null);
 	resetGame();
 });
 
-handleClick($('.play-casual-btn'), () => {
-	setGameMode(GAME_MODE_CASUAL);
-	setActiveMenu(null);
-	resetGame();
-});
-
-// Pause Menu
-handleClick($('.resume-btn'), () => resumeGame());
-handleClick($('.menu-btn--pause'), () => setActiveMenu(MENU_MAIN));
-
 // Score Menu
 handleClick($('.play-again-btn'), () => {
+	startTime = performance.now();
 	setActiveMenu(null);
 	resetGame();
 });
-
-handleClick($('.menu-btn--score'), () => setActiveMenu(MENU_MAIN));
 
 ////////////////////
 // Button Actions //
@@ -1305,26 +1272,11 @@ handleClick($('.play-normal-btn'), () => {
 	resetGame();
 });
 
-handleClick($('.play-casual-btn'), () => {
-	setGameMode(GAME_MODE_CASUAL);
-	setActiveMenu(null);
-	resetGame();
-});
-
-// Pause Menu
-handleClick($('.resume-btn'), () => resumeGame());
-handleClick($('.menu-btn--pause'), () => setActiveMenu(MENU_MAIN));
-
 // Score Menu
 handleClick($('.play-again-btn'), () => {
 	setActiveMenu(null);
 	resetGame();
 });
-
-handleClick($('.menu-btn--score'), () => setActiveMenu(MENU_MAIN));
-
-
-
 
 
 // actions.js
@@ -1344,7 +1296,7 @@ function setActiveMenu(menu) {
 
 function setScore(score) {
 	state.game.score = score;
-	renderScoreHud();
+	// renderScoreHud();
 }
 
 function incrementScore(inc) {
@@ -1353,19 +1305,19 @@ function incrementScore(inc) {
 		if (state.game.score < 0) {
 			state.game.score = 0;
 		}
-		renderScoreHud();
+		// renderScoreHud();
 	}
 }
 
 function setCubeCount(count) {
 	state.game.cubeCount = count;
-	renderScoreHud();
+	// renderScoreHud();
 }
 
 function incrementCubeCount(inc) {
 	if (isInGame()) {
 		state.game.cubeCount += inc;
-		renderScoreHud();
+		// renderScoreHud();
 	}
 }
 
@@ -1387,18 +1339,13 @@ function resetGame() {
 	spawnTime = getSpawnDelay();
 }
 
-function pauseGame() {
-	isInGame() && setActiveMenu(MENU_PAUSE);
-}
-
 function resumeGame() {
-	isPaused() && setActiveMenu(null);
+	setActiveMenu(null);
 }
 
 function endGame() {
-	// Save this data
-	console.log("Game has ended:) " +  _lastHighscore);
-	const sessionScore = state.game.score;
+	endTime = performance.now();
+	timeSpent = (endTime - startTime)/1000;
 
 	state.game.sessionTry += 1;
 
@@ -1406,28 +1353,29 @@ function endGame() {
 	if (isNewHighScore()) {
 		setHighScore(state.game.score);
 	}
-	network.JsonData.addData(["score", "high"], [sessionScore, isNewHighScore()]);
+	network.JsonData.addData(["bgColor","try", "score", "high", "time"], [bgColors[currColor], state.game.sessionTry, state.game.score, isNewHighScore(), timeSpent]);
 	console.log(JSON.stringify(network.JsonData.jsonObj));
 	// let user have a retry or go to questions
 	if (state.game.sessionTry < 2) {
 		console.log("%d tries left", (2-state.game.sessionTry));
 		setActiveMenu(MENU_SCORE);
 	} else {
-		// network.JsonData.storeData(url);
-		localStorage.removeItem(highScoreKey);
-		const encodedJsonData = encodeURIComponent(JSON.stringify(jsonData));
-		window.location.href = "question.html?data=" + encodedJsonData;
+		if (currColor == secondColor) {
+			localStorage.removeItem(highScoreKey);
+			const encodedJsonData = encodeURIComponent(JSON.stringify(network.JsonData.jsonObj));
+			window.location.href = "question.html?data=" + encodedJsonData;
+		} else {
+			state.game.sessionTry = 0;
+			currColor = secondColor
+			document.body.style.backgroundColor = bgColors[currColor];
+			setActiveMenu(MENU_SCORE);
+		}
 	}
 }
 
 ////////////////////////
 // KEYBOARD SHORTCUTS //
 ////////////////////////
-window.addEventListener('keydown', event => {
-	if (event.key === 'p') {
-		isPaused() ? resumeGame() : pauseGame();
-	}
-});
 
 // tick.js
 let spawnTime = 0;
@@ -1576,11 +1524,7 @@ function tick(width, height, simTime, simSpeed, lag) {
 			targets.splice(i, 1);
 			returnTarget(target);
 			if (isInGame()) {
-				if (isCasualGame()) {
-					incrementScore(-25);
-				} else {
-					endGame();
-				}
+				endGame();
 			}
 			continue;
 		}
@@ -1615,7 +1559,7 @@ function tick(width, height, simTime, simSpeed, lag) {
 
 					if (pointerSpeedScaled > minPointerSpeed) {
 						target.health--;
-						incrementScore(10);
+						incrementScore(1);
 
 						if (target.health <= 0) {
 							incrementCubeCount(2);
@@ -1634,7 +1578,6 @@ function tick(width, height, simTime, simSpeed, lag) {
 							updateTargetHealth(target, 0);
 						}
 					} else {
-						incrementScore(5);
 						sparkBurst(hitX, hitY, 3, sparkSpeed);
 					}
 				}
@@ -1963,10 +1906,6 @@ function setupCanvas() {
 
 		// always queue another frame
 		raf();
-
-		// If game is paused, we'll still track frameTime (above) but all other
-		// game logic and drawing can be avoided.
-		if (isPaused()) return;
 
 		// make sure negative time isn't reported (first frame can be whacky)
 		if (frameTime < 0) {

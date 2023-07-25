@@ -22,17 +22,29 @@ module.exports = {
       template: './src/client/question.html',
       filename: 'question.html',
       chunks: ['question']
-    })
+    }),
+    new MiniCssExtractPlugin({
+      filename: '[name].css', // Output extracted CSS files with the same name as their entry
+    }),
   ],
   module: {
     rules: [
       {
-        test: /\.css$/,
+        test: /styles\.css$/, // Process styles.css separately for index.html
         use: [
-          'style-loader', // Apply style loader only for index.html
+          'style-loader',
           'css-loader',
         ],
-        include: path.resolve(__dirname, 'src', 'client', 'styles.css'),
+        include: path.resolve(__dirname, 'src', 'client'),
+        exclude: path.resolve(__dirname, 'src', 'client', 'question.css'), // Exclude question.css from styles.css processing
+      },
+      {
+        test: /question\.css$/, // Process question.css separately for question.html
+        use: [
+          'style-loader',
+          'css-loader',
+        ],
+        include: path.resolve(__dirname, 'src', 'client'),
       },
     ],
   },
