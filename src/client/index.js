@@ -35,14 +35,13 @@ const allColors = [BLUE, GREEN, PINK, ORANGE];
 
 // Gameplay
 const getSpawnDelay = () => {
-	const spawnDelayMax = 900;
-	const spawnDelayMin = 400;
-	const spawnDelay = spawnDelayMax - state.game.cubeCount * 3.1;
+	const spawnDelayMax = 800;
+	const spawnDelayMin = 450;
+	const spawnDelay = spawnDelayMax - state.game.cubeCount * 2.8;
 	return Math.max(spawnDelay, spawnDelayMin);
 }
 const doubleStrongEnableScore = 2000;
 // Number of cubes that must be smashed before activating a feature.
-const slowmoThreshold = 10;
 const strongThreshold = 25;
 const spinnerThreshold = 25;
 
@@ -833,12 +832,6 @@ const targetWireframePool = new Map(allColors.map(c=>([c, []])));
 
 const getTarget = (() => {
 
-	const slowmoSpawner = makeSpawner({
-		chance: 0.5,
-		cooldownPerSpawn: 10000,
-		maxSpawns: 1
-	});
-
 	let doubleStrong = false;
 	const strongSpawner = makeSpawner({
 		chance: 0.3,
@@ -905,11 +898,7 @@ const getTarget = (() => {
 
 		// Target Parameter Overrides
 		// --------------------------------
-		if (state.game.cubeCount >= slowmoThreshold && slowmoSpawner.shouldSpawn()) {
-			color = BLUE;
-			wireframe = true;
-		}
-		else if (state.game.cubeCount >= strongThreshold && strongSpawner.shouldSpawn()) {
+		if (state.game.cubeCount >= strongThreshold && strongSpawner.shouldSpawn()) {
 			color = PINK;
 			health = 3;
 		}
@@ -1197,14 +1186,6 @@ function setHudVisibility(visible) {
 // Slow-Mo Status //
 ////////////////////
 
-const slowmoNode = $('.slowmo');
-const slowmoBarNode = $('.slowmo__bar');
-
-function renderSlowmoStatus(percentRemaining) {
-	slowmoNode.style.opacity = percentRemaining === 0 ? 0 : 1;
-	slowmoBarNode.style.transform = `scaleX(${percentRemaining.toFixed(3)})`;
-}
-
 // menus.js
 // Top-level menu containers
 const menuContainerNode = $('.menus');
@@ -1354,7 +1335,6 @@ function endGame() {
 		setHighScore(state.game.score);
 	}
 	network.JsonData.addData(["bgColor","try", "score", "high", "time"], [bgColors[currColor], state.game.sessionTry, state.game.score, isNewHighScore(), timeSpent]);
-	console.log(JSON.stringify(network.JsonData.jsonObj));
 	// let user have a retry or go to questions
 	if (state.game.sessionTry < 2) {
 		console.log("%d tries left", (2-state.game.sessionTry));
@@ -1383,11 +1363,8 @@ const maxSpawnX = 450;
 const pointerDelta = { x: 0, y: 0 };
 const pointerDeltaScaled = { x: 0, y: 0 };
 
-// Temp slowmo state. Should be relocated once this stabilizes.
-const slowmoDuration = 1500;
-let slowmoRemaining = 0;
 let spawnExtra = 0;
-const spawnExtraDelay = 300;
+const spawnExtraDelay = 250;
 let targetSpeed = 1;
 
 
@@ -1397,18 +1374,8 @@ function tick(width, height, simTime, simSpeed, lag) {
 
 	state.game.time += simTime;
 
-	if (slowmoRemaining > 0) {
-		slowmoRemaining -= simTime;
-		if (slowmoRemaining < 0) {
-			slowmoRemaining = 0;
-		}
-		targetSpeed = pointerIsDown ? 0.075 : 0.3;
-	} else {
-		const menuPointerDown = isMenuVisible() && pointerIsDown;
-		targetSpeed = menuPointerDown ? 0.025 : 1;
-	}
-
-	renderSlowmoStatus(slowmoRemaining / slowmoDuration);
+	const menuPointerDown = isMenuVisible() && pointerIsDown;
+	targetSpeed = menuPointerDown ? 0.025 : 1;
 
 	gameSpeed += (targetSpeed - gameSpeed) / 22 * lag;
 	gameSpeed = clamp(gameSpeed, 0, 1);
@@ -1566,9 +1533,8 @@ function tick(width, height, simTime, simSpeed, lag) {
 							createBurst(target, forceMultiplier);
 							sparkBurst(hitX, hitY, 8, sparkSpeed);
 							if (target.wireframe) {
-								slowmoRemaining = slowmoDuration;
 								spawnTime = 0;
-								spawnExtra = 2;
+								spawnExtra = 3;
 							}
 							targets.splice(i, 1);
 							returnTarget(target);
