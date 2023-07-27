@@ -1,5 +1,7 @@
 import "./question.css";
 
+const url = "https://flask-bninja.ey.r.appspot.com";
+
 const network = require("./network");
 const jsonData = new network.JsonData();
 
@@ -8,9 +10,7 @@ const encodedJsonData = urlParams.get("data");
 const decodedJsonString = decodeURIComponent(encodedJsonData);
 const data = JSON.parse(decodedJsonString);
 
-jsonData.jsonObj = data
-
-console.log(JSON.stringify(data));
+network.JsonData.jsonObj = data
 
 function createLikertScale(containerClass, labels) {
     const likertContainers = document.querySelectorAll(`.${containerClass}`);
@@ -56,4 +56,55 @@ const likertLabels = [
 ];
 
 createLikertScale("likertContainer", likertLabels);
-  
+
+
+// Submitting data
+
+const button = document.getElementById("submit");
+const err = document.getElementById("errorNotice");
+
+button.addEventListener("click", () => {
+    let keys = [1,2,3,4,5,6,7];
+    let values = [];
+    // score
+    const score = document.getElementById("1").value;
+    const scoreInt = parseInt(score);
+    if (isNaN(scoreInt)) {
+      err.textContent = "Not a valid number in question 1";
+      return
+    }
+    else {
+      values.push(scoreInt);
+    }
+    // color
+    const color = document.getElementById("2").value;
+    values.push(color);
+    // values from likerts    
+    const likertContainers = document.querySelectorAll(".likertContainer")
+    for (let i = 0; i < likertContainers.length; i++) {
+        const container = likertContainers[i];
+        const id = container.id;
+        const selected = container.querySelector("input[type=\"radio\"]:checked")
+
+        if (selected == null) {
+            err.textContent = `Missing answer in statement ${id}`
+            return
+        }
+        else {
+          const likertSelectedValue = selected.value;
+          values.push(likertSelectedValue)
+        }
+    }
+    // opinion
+    const opinion = document.getElementById("7").value
+    console.log(opinion);
+    if (opinion == "") {
+      err.textContent = "Missing answer in question 7"
+      return
+    }
+    else {
+      values.push(opinion);
+    }
+    network.JsonData.addQA(keys,values);
+    network.JsonData.storeData(url);
+});

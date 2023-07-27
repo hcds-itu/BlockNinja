@@ -1,6 +1,5 @@
-import './styles.css';
+import "./styles.css";
 // This is the user data
-const url = "https://flask-bninja.ey.r.appspot.com";
 const network = require("./network.js");
 const jsonData = new network.JsonData();
 jsonData.jsonObj = {};
@@ -1320,10 +1319,6 @@ function resetGame() {
 	spawnTime = getSpawnDelay();
 }
 
-function resumeGame() {
-	setActiveMenu(null);
-}
-
 function endGame() {
 	endTime = performance.now();
 	timeSpent = (endTime - startTime)/1000;
@@ -1337,11 +1332,11 @@ function endGame() {
 	network.JsonData.addData(["bgColor","try", "score", "high", "time"], [bgColors[currColor], state.game.sessionTry, state.game.score, isNewHighScore(), timeSpent]);
 	// let user have a retry or go to questions
 	if (state.game.sessionTry < 2) {
-		console.log("%d tries left", (2-state.game.sessionTry));
 		setActiveMenu(MENU_SCORE);
 	} else {
+		localStorage.removeItem(highScoreKey);
+		_lastHighscore = -1;
 		if (currColor == secondColor) {
-			localStorage.removeItem(highScoreKey);
 			const encodedJsonData = encodeURIComponent(JSON.stringify(network.JsonData.jsonObj));
 			window.location.href = "question.html?data=" + encodedJsonData;
 		} else {
