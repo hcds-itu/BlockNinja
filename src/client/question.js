@@ -69,7 +69,7 @@ button.addEventListener("click", () => {
     // score
     const score = document.getElementById("1").value;
     const scoreInt = parseInt(score);
-    if (isNaN(scoreInt)) {
+    if (isNaN(scoreInt) || scoreInt < 0) {
       err.textContent = "Not a valid number in question 1";
       return
     }
@@ -97,7 +97,6 @@ button.addEventListener("click", () => {
     }
     // opinion
     const opinion = document.getElementById("7").value
-    console.log(opinion);
     if (opinion == "") {
       err.textContent = "Missing answer in question 7"
       return
@@ -107,4 +106,5 @@ button.addEventListener("click", () => {
     }
     network.JsonData.addQA(keys,values);
     network.JsonData.storeData(url);
+    window.location.href = "index.html";
 });
