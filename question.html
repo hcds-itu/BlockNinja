@@ -1,0 +1,37 @@
+<!-- https://codepen.io/Buttonpresser/pen/poXVod -->
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Questions</title>  
+<script defer src="question.bundle.js"></script></head>
+<body>
+  <h1>Please answer the following questions</h1>
+  <li class = "normalQ">
+    <p>1: What do you think your average score was? </p><input id = "1" type="number" min = "0" max = "100">
+  </li>
+  <li class = "normalQ">
+    <p>2: Which colour do you think leads to better performance? </p>
+    <select id="2">
+      <option value="blue">blue</option>
+      <option value="red">red</option>
+    </select>
+  </li>
+  <div class="wrap">
+    <form action="">
+      <p class="statement">3: I knew what the researchers were investigating in this research</p>
+      <div class="likertContainer" id = "3"></div>
+      <p class="statement">4: I wasn't sure what the researchers were trying to demonstrate in this research</p>
+      <div class="likertContainer" id = "4"></div>
+      <p class="statement">5: I had a good idea about what the hypotheses were in this research</p>
+      <div class="likertContainer" id = "5"></div>
+      <p class="statement">6: I was unclear about exactly what the researchers were aiming to prove in this research</p>
+      <div class="likertContainer" id = "6"></div>
+    </form>
+  </div>
+  <li id = "largeText">
+    <p>7: What do you think the study was about? </p><textarea id = "7" rows="5" cols="10" wrap="soft" ></textarea>
+  </li>
+  <button id = "submit">Submit</button><p id = "errorNotice"></p>
+</body>
+</html>
