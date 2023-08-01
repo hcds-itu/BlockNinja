@@ -2,10 +2,11 @@
   "name": "blockninja",
   "version": "1.0.0",
   "description": "A clone game of Fruit Ninja",
-  "main": "server.js",
+  "main": "./src/server/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node ./src/server/server.js",
+    "deploy" : "gh-pages -d dist"
   },
   "repository": {
     "type": "git",
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "css-loader": "^6.8.1",
+    "gh-pages": "^5.0.0",
     "html-webpack-plugin": "^5.5.3",
     "style-loader": "^3.3.3",
     "webpack": "^5.88.1",
