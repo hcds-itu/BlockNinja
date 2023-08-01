@@ -203,7 +203,7 @@ h2 {
 	margin: 0 0 2.5em;
 }
 
-button {
+button, #go-to-survey {
 	display: block;
 	position: relative;
 	width: 400px;

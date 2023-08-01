@@ -18,6 +18,10 @@ let startTime;
 let endTime;
 let timeSpent;
 
+let finished = false;
+let finishedTime;
+let second = 1;
+
 // globalConfig.js
 // Provides global variables used by the entire program.
 // Most of this should be configuration.
@@ -115,6 +119,7 @@ const GAME_MODE_RANKED = Symbol('GAME_MODE_RANKED');
 // Available Menus
 const MENU_MAIN = Symbol('MENU_MAIN');
 const MENU_SCORE = Symbol('MENU_SCORE');
+const MENU_DONE = Symbol('MENU_DONE');
 
 
 
@@ -1178,6 +1183,7 @@ function setHudVisibility(visible) {
 const menuContainerNode = $('.menus');
 const menuMainNode = $('.menu--main');
 const menuScoreNode = $('.menu--score');
+const menuDoneNode = $('.menu--done');
 
 
 function showMenu(node) {
@@ -1191,6 +1197,7 @@ function hideMenu(node) {
 function renderMenus() {
 	hideMenu(menuMainNode);
 	hideMenu(menuScoreNode);
+	hideMenu(menuDoneNode);
 
 	switch (state.menus.active) {
 		case MENU_MAIN:
@@ -1198,6 +1205,9 @@ function renderMenus() {
 			break;
 		case MENU_SCORE:
 			showMenu(menuScoreNode);
+			break;
+		case MENU_DONE:
+			showMenu(menuDoneNode);
 			break;
 	}
 
@@ -1207,6 +1217,8 @@ function renderMenus() {
 }
 
 renderMenus();
+
+
 
 
 
@@ -1319,14 +1331,13 @@ function endGame() {
 	}
 	network.JsonData.addData(["bgColor","try", "score", "high", "time"], [bgColors[currColor], state.game.sessionTry, state.game.score, isNewHighScore(), timeSpent]);
 	// let user have a retry or go to questions
-	if (state.game.sessionTry < 2) {
+	if (state.game.sessionTry < 1) {
 		setActiveMenu(MENU_SCORE);
 	} else {
 		localStorage.removeItem(highScoreKey);
 		_lastHighscore = -1;
 		if (currColor == secondColor) {
-			const encodedJsonData = encodeURIComponent(JSON.stringify(network.JsonData.jsonObj));
-			window.location.href = "question.html?data=" + encodedJsonData;
+			setActiveMenu(MENU_DONE);
 		} else {
 			state.game.sessionTry = 0;
 			currColor = secondColor
@@ -1357,6 +1368,27 @@ function tick(width, height, simTime, simSpeed, lag) {
 
 	state.game.time += simTime;
 
+	// Handles countdown before going to survey
+	if (state.menus.active == MENU_DONE) {
+		if (!finished) {
+			finished = true;
+			finishedTime = state.game.time;
+		} else {
+			let done = finishedTime + 6000 < state.game.time;
+			if (done) {
+				second = 1;
+				finished = false;
+				finishedTime = 0;
+				const encodedJsonData = encodeURIComponent(JSON.stringify(network.JsonData.jsonObj));
+				window.location.href = "question.html?data=" + encodedJsonData;
+			}
+			else if ((finishedTime + 1000*second) < state.game.time){
+				console.log(second)
+				second += 1;
+				document.getElementById("go-to-survey").textContent = `Going to survey in ${6 - Math.ceil((state.game.time-finishedTime)/1000)} seconds`
+			}
+		}
+	}
 	const menuPointerDown = isMenuVisible() && pointerIsDown;
 	targetSpeed = menuPointerDown ? 0.025 : 1;
 
