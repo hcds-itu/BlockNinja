@@ -1,6 +1,6 @@
 import "./question.css";
 
-const url = "http://flask-bninja.ey.r.appspot.com";
+const url = "https://flask-bninja.ey.r.appspot.com";
 
 const network = require("./network");
 const jsonData = new network.JsonData();
