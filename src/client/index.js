@@ -20,7 +20,7 @@ let timeSpent;
 
 let finished = false;
 let finishedTime;
-let second = 1;
+let second = 0;
 
 // globalConfig.js
 // Provides global variables used by the entire program.
@@ -1374,9 +1374,9 @@ function tick(width, height, simTime, simSpeed, lag) {
 			finished = true;
 			finishedTime = state.game.time;
 		} else {
-			let done = finishedTime + 6000 < state.game.time;
+			let done = finishedTime + 4000 < state.game.time;
 			if (done) {
-				second = 1;
+				second = 0;
 				finished = false;
 				finishedTime = 0;
 				const encodedJsonData = encodeURIComponent(JSON.stringify(network.JsonData.jsonObj));
@@ -1384,7 +1384,7 @@ function tick(width, height, simTime, simSpeed, lag) {
 			}
 			else if ((finishedTime + 1000*second) < state.game.time){
 				second += 1;
-				document.getElementById("go-to-survey").textContent = `Going to survey in ${6 - Math.ceil((state.game.time-finishedTime)/1000)} seconds`
+				document.getElementById("go-to-survey").textContent = `Going to survey in ${4 - Math.ceil((state.game.time-finishedTime)/1000)} seconds`
 			}
 		}
 	}
