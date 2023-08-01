@@ -5,7 +5,9 @@ Demo: <code><a href="https://jeherillajanwar.github.io/BlockNinja/">https://jehe
 
 New changes: npx webpack --config webpack.config.js
 
-Run: node src/server/server.js
+Run: npm start
+
+Add to github pages: npm run deploy
 
 # TODO
 
