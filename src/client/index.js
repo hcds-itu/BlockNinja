@@ -1331,7 +1331,7 @@ function endGame() {
 	}
 	network.JsonData.addData(["bgColor","try", "score", "high", "time"], [bgColors[currColor], state.game.sessionTry, state.game.score, isNewHighScore(), timeSpent]);
 	// let user have a retry or go to questions
-	if (state.game.sessionTry < 1) {
+	if (state.game.sessionTry < 2) {
 		setActiveMenu(MENU_SCORE);
 	} else {
 		localStorage.removeItem(highScoreKey);
@@ -1383,7 +1383,6 @@ function tick(width, height, simTime, simSpeed, lag) {
 				window.location.href = "question.html?data=" + encodedJsonData;
 			}
 			else if ((finishedTime + 1000*second) < state.game.time){
-				console.log(second)
 				second += 1;
 				document.getElementById("go-to-survey").textContent = `Going to survey in ${6 - Math.ceil((state.game.time-finishedTime)/1000)} seconds`
 			}
