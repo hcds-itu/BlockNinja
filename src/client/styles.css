@@ -178,36 +178,18 @@ body {
 /* Common menu elements */
 
 h1 {
-	font-size: 4rem;
+	font-size: 4.3vh;
 	line-height: 0.95;
 	text-align: center;
 	font-weight: bold;
 	margin: 0 0.65em 1em;
 }
 
-h2 {
-	font-size: 1.2rem;
-	line-height: 1;
-	text-align: center;
-	font-weight: bold;
-	margin: -1em 0.65em 1em;
-}
-
-.final-score-lbl {
-	font-size: 5rem;
-	margin: -0.2em 0 0;
-}
-
-.high-score-lbl {
-	font-size: 1.2rem;
-	margin: 0 0 2.5em;
-}
-
 button, #go-to-survey {
 	display: block;
 	position: relative;
 	width: 400px;
-	height: 200px;
+	height: 70px;
 	padding: 12px 20px;
 	background: transparent;
 	border: none;
@@ -215,7 +197,7 @@ button, #go-to-survey {
 	user-select: none;
 	font-family: monospace;
 	font-weight: bold;
-	font-size: 3.4rem;
+	font-size: 3.1vh;
 	color: #fff;
 	opacity: 0.75;
 	transition: opacity 0.3s;
@@ -249,7 +231,7 @@ a {
 }
 
 /* Only enable hover state on large screens */
-@media (min-width: 1025px) {
+@media (min-width: 350px) {
 	button:hover {
 		opacity: 1;
 	}
