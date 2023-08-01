@@ -51,12 +51,11 @@ let pointerScreen = { x: 0, y: 0 };
 // Same as `pointerScreen`, but converted to scene coordinates in rAF.
 let pointerScene = { x: 0, y: 0 };
 // Minimum speed of pointer before "hits" are counted.
-const minPointerSpeed = 60;
+const minPointerSpeed = 5;
 // The hit speed affects the direction the target post-hit. This number dampens that force.
 const hitDampening = 0.1;
 // Backboard receives shadows and is the farthest negative Z position of entities.
 const backboardZ = -400;
-const shadowColor = '#262e36';
 // How much air drag is applied to standard objects
 const airDrag = 0.022;
 const gravity = 0.3;
@@ -737,7 +736,6 @@ function optimizeModel(model, threshold=0.0001) {
 class Entity {
 	constructor({ model, color, wireframe=false }) {
 		const vertices = cloneVertices(model.vertices);
-		const shadowVertices = cloneVertices(model.vertices);
 		const colorHex = colorToHex(color);
 		const darkColorHex = shadeColor(color, 0.4);
 
@@ -754,18 +752,10 @@ class Entity {
 			normalCamera: { x: 0, y: 0, z: 0 }
 		}));
 
-		const shadowPolys = model.polys.map(p => ({
-			vertices: p.vIndexes.map(vIndex => shadowVertices[vIndex]),
-			wireframe: wireframe,
-			normalWorld: { x: 0, y: 0, z: 0 }
-		}));
-
 		this.projected = {}; // Will store 2D projected data
 		this.model = model;
 		this.vertices = vertices;
 		this.polys = polys;
-		this.shadowVertices = shadowVertices;
-		this.shadowPolys = shadowPolys;
 		this.reset();
 	}
 
@@ -807,8 +797,6 @@ class Entity {
 			this.scaleY,
 			this.scaleZ
 		);
-
-		copyVerticesTo(this.vertices, this.shadowVertices);
 	}
 
 	// Projects origin point, stored as `projected` property.
@@ -892,7 +880,7 @@ const getTarget = (() => {
 		let color = pickOne([BLUE, GREEN, ORANGE]);
 		let wireframe = false;
 		let health = 1;
-		let maxHealth = 3;
+		let maxHealth = 1;
 		const spinner = state.game.cubeCount >= spinnerThreshold && isInGame() && spinnerSpawner.shouldSpawn();
 
 		// Target Parameter Overrides
@@ -1632,15 +1620,11 @@ function tick(width, height, simTime, simSpeed, lag) {
 	targets.forEach(entity => {
 		allVertices.push(...entity.vertices);
 		allPolys.push(...entity.polys);
-		allShadowVertices.push(...entity.shadowVertices);
-		allShadowPolys.push(...entity.shadowPolys);
 	});
 
 	frags.forEach(entity => {
 		allVertices.push(...entity.vertices);
 		allPolys.push(...entity.polys);
-		allShadowVertices.push(...entity.shadowVertices);
-		allShadowPolys.push(...entity.shadowPolys);
 	});
 
 	// Scene calculations/transformations
@@ -1654,36 +1638,6 @@ function tick(width, height, simTime, simSpeed, lag) {
 	allPolys.forEach(p => computePolyNormal(p, 'normalCamera'));
 
 	PERF_END('3D');
-
-	PERF_START('shadows');
-
-	// Rotate shadow vertices to light source perspective
-	transformVertices(
-		allShadowVertices,
-		allShadowVertices,
-		0, 0, 0,
-		TAU/8, 0, 0,
-		1, 1, 1
-	);
-
-	allShadowPolys.forEach(p => computePolyNormal(p, 'normalWorld'));
-
-	const shadowDistanceMult = Math.hypot(1, 1);
-	const shadowVerticesLength = allShadowVertices.length;
-	for (let i=0; i<shadowVerticesLength; i++) {
-		const distance = allVertices[i].z - backboardZ;
-		allShadowVertices[i].z -= shadowDistanceMult * distance;
-	}
-	transformVertices(
-		allShadowVertices,
-		allShadowVertices,
-		0, 0, 0,
-		-TAU/8, 0, 0,
-		1, 1, 1
-	);
-	allShadowVertices.forEach(projectVertex);
-
-	PERF_END('shadows');
 
 	PERF_END('tick');
 }
@@ -1699,39 +1653,6 @@ function draw(ctx, width, height, viewScale) {
 	// 3D Polys
 	// ---------------
 	ctx.lineJoin = 'bevel';
-
-	PERF_START('drawShadows');
-	ctx.fillStyle = shadowColor;
-	ctx.strokeStyle = shadowColor;
-	allShadowPolys.forEach(p => {
-		if (p.wireframe) {
-			ctx.lineWidth = 2;
-			ctx.beginPath();
-			const { vertices } = p;
-			const vCount = vertices.length;
-			const firstV = vertices[0];
-			ctx.moveTo(firstV.x, firstV.y);
-			for (let i=1; i<vCount; i++) {
-				const v = vertices[i];
-				ctx.lineTo(v.x, v.y);
-			}
-			ctx.closePath();
-			ctx.stroke();
-		} else {
-			ctx.beginPath();
-			const { vertices } = p;
-			const vCount = vertices.length;
-			const firstV = vertices[0];
-			ctx.moveTo(firstV.x, firstV.y);
-			for (let i=1; i<vCount; i++) {
-				const v = vertices[i];
-				ctx.lineTo(v.x, v.y);
-			}
-			ctx.closePath();
-			ctx.fill();
-		}
-	});
-	PERF_END('drawShadows');
 
 	PERF_START('drawPolys');
 
