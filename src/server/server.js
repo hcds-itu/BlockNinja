@@ -15,6 +15,11 @@ app.get('/question', (req, res) => {
   res.sendFile(path.join(__dirname, '..', '..', 'dist', 'question.html'));
 });
 
+// Route for the "/end" URL
+app.get('/end', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', '..', 'dist', 'end.html'));
+});
+
 // Other server-side routes and logic
 
 // Start the server

@@ -7,6 +7,7 @@ module.exports = {
   entry: {
     index: "./src/client/index.js",
     question: "./src/client/question.js",
+    end: "./src/client/end.js", // Add the entry point for end.js
   },
   output: {
     filename: "[name].bundle.js",
@@ -41,8 +42,10 @@ module.exports = {
           "css-loader",
         ],
         include: path.resolve(__dirname, "src", "client"),
-        exclude: path.resolve(__dirname, "src", "client", "question.css"), // Exclude question.css from styles.css processing
-        exclude: path.resolve(__dirname, "src", "client", "end.css"), // Exclude end.css from styles.css processing
+        exclude: [
+          path.resolve(__dirname, "src", "client", "question.css"),
+          path.resolve(__dirname, "src", "client", "end.css"), // Exclude question.css and end.css from styles.css processing
+        ],
       },
       {
         test: /question\.css$/, // Process question.css separately for question.html
@@ -54,7 +57,7 @@ module.exports = {
         exclude: path.resolve(__dirname, "src", "client", "end.css"), // Exclude end.css from question.css processing
       },
       {
-        test: /end\.css$/, // Process question.css separately for question.html
+        test: /end\.css$/, // Process end.css separately for end.html
         use: [
           "style-loader",
           "css-loader",
