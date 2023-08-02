@@ -36,7 +36,7 @@ class JsonData {
             method: "POST",
             body: JSON.stringify(JsonData.jsonObj),
             headers: {
-                'Accept': 'application/json',
+                "Accept": "application/json",
                 "Content-Type": "application/json"
             },
         })

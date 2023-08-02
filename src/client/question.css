@@ -2,7 +2,7 @@ html, body {
   padding: 0;
   margin: 0;
   overflow-x:hidden;
-  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-family: Arial, Helvetica, sans-serif;
   
   background-image: linear-gradient(#baa8cf,#f6f0fa);
 }
@@ -25,6 +25,9 @@ h1 {
 }
 
 .normalQ input[type="number"] {
+  border-left: none;
+  border-right: none;
+  border-top: none;
   display: inline-block;
 }
 
@@ -95,6 +98,28 @@ form .statement {
   padding-left: 2%;
 }
 
+#color-options {
+  list-style: none;
+  padding: 0;
+}
+
+#color-options li {
+  display: flex;
+  align-items: center;
+  margin: 10px 0; /* Equal top and bottom margin (adjust the value as needed) */
+}
+
+#color-options li label {
+  display: flex;
+  align-items: center;
+  flex: 1; /* This will make the label fill the available horizontal space */
+  margin-right: 10px; /* Adjust this value as needed */
+}
+
+#color-options li input[type="radio"] {
+  margin-right: 1%;
+}
+
 form .likert:last-of-type {
   border-bottom: 0;
 }
@@ -135,10 +160,18 @@ form .likert li input[type=radio] {
   margin-left: -6px;
 }
 
-form .likert li label {
-  font-size: 60%;
-  width: 100%;
+input, button {
+  cursor: pointer;
+}
+
+input[type="radio"]:checked {
+  accent-color:#8e62c7;
+}
+
+li label {
+  cursor: pointer;
   color: #636363;
+  transition: all 0.2s ease-in-out;
 }
 
 form {
@@ -152,7 +185,14 @@ form {
     margin-bottom: 1%;
     font-size: 38px;
   }
-  .normalQ input, .normalQ select {
+
+  input[type = "radio"] {
+    margin-bottom: 4px;
+    height: 20px;
+    width: 20px;
+  }
+  
+  .normalQ input, .normalQ {
     size: 22px;
     color: #636363;
   }
@@ -160,11 +200,11 @@ form {
   form p.statement,
   .normalQ p {
     width: auto;
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 500;
   }
-  form .likert li label {
-    font-size: 20px;
+  li label {
+    font-size: 24px;
     width: 100%;
   }
   li {
@@ -198,21 +238,26 @@ form {
     font-size: 35px;
   }
 
+  input[type = "radio"] {
+    margin-bottom: 5px;
+    height: 20px;
+    width: 20px;
+  }  
+
   #largeText p,
   form p.statement,
   .normalQ p {
     width: auto;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 500;
   }
-  .normalQ input, .normalQ select {
-    size: 13px;
+  .normalQ input, .normalQ {
+    size: 18px;
     color: #636363;
   }
-  form .likert li label {
-    font-size: 12px;
+  li label {
+    font-size: 18px;
     width: 100%;
-    color: #636363;
   }
   li {
     width: 96%;
@@ -227,6 +272,30 @@ form {
   }
   submit {
     padding:2%;
+  }
+}
+
+@media (max-width: 515px) {  
+  #largeText p,
+  form p.statement,
+  .normalQ p {
+    width: auto;
+    font-size: 17px;
+    font-weight: 500;
+  }
+
+  input[type = "radio"] {
+    margin-bottom: 7px;
+    height: 18px;
+    width: 18px;
+  }  
+  .normalQ input, .normalQ {
+    size: 13px;
+    color: #636363;
+  }
+  li label {
+    font-size: 13px;
+    width: 100%;
   }
 }
 

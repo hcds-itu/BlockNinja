@@ -13,37 +13,62 @@ const data = JSON.parse(decodedJsonString);
 network.JsonData.jsonObj = data
 
 function createLikertScale(containerClass, labels) {
-    const likertContainers = document.querySelectorAll(`.${containerClass}`);
-  
-    likertContainers.forEach((container, index) => {
-      // Create the ul element for the likert scale
-      const likertList = document.createElement("ul");
-      likertList.classList.add("likert");
-  
-      // Loop through the labels and create li elements with radio inputs and labels
-      for (let i = labels.length - 1; i >= 0; i--) {
-        const labelValue = labels[i].value;
-        const labelText = labels[i].text;
-  
-        const listItem = document.createElement("li");
-  
-        const input = document.createElement("input");
-        input.type = "radio";
-        input.name = `likert-${index}`; // Use index to differentiate between likert scales
-        input.value = labelValue;
-  
-        const label = document.createElement("label");
-        label.textContent = labelText;
-  
-        listItem.appendChild(input);
-        listItem.appendChild(label);
-        likertList.appendChild(listItem);
-      }
-  
-      // Append the likert scale to the container
-      container.appendChild(likertList);
+  const likertContainers = document.querySelectorAll(`.${containerClass}`);
+
+  likertContainers.forEach((container, index) => {
+    // Create the ul element for the likert scale
+    const likertList = document.createElement("ul");
+    likertList.classList.add("likert");
+
+    // Loop through the labels and create li elements with radio inputs and labels
+    for (let i = labels.length - 1; i >= 0; i--) {
+      const labelValue = labels[i].value;
+      const labelText = document.createTextNode(labels[i].text);
+
+      const listItem = document.createElement("li");
+
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.className = "likertInput";
+      input.name = `likert-${index}`; // Use index to differentiate between likert scales
+      input.value = labelValue;
+
+      const label = document.createElement("label");
+
+      label.appendChild(input);
+      label.appendChild(labelText);
+
+      listItem.appendChild(label);
+      likertList.appendChild(listItem);
+    }
+
+    // Append the likert scale to the container
+    container.appendChild(likertList);
+
+    // Function to update the label styles when a radio button is checked/unchecked within the specific container
+    function updateLabelStyle() {
+      const radioInputs = container.querySelectorAll(".likertInput");
+      radioInputs.forEach((input) => {
+        const label = input.parentElement;
+        if (input.checked) {
+          label.style.color = "#8e62c7"; // Change the color to any desired color when the radio button is checked
+          label.style.fontWeight = "bold";
+        } else {
+          label.style.color = "#636363"; // Change the color to any desired color when the radio button is unchecked
+          label.style.fontWeight = "normal";
+        }
+      });
+    }
+
+    const radioInputs = container.querySelectorAll(".likertInput");
+    radioInputs.forEach((input) => {
+      input.addEventListener("change", updateLabelStyle);
     });
+
+    updateLabelStyle();
+  });
 }
+
 
 // Call the function with the likert labels and values
 const likertLabels = [
@@ -56,7 +81,6 @@ const likertLabels = [
 ];
 
 createLikertScale("likertContainer", likertLabels);
-
 
 // Submitting data
 
@@ -76,9 +100,16 @@ button.addEventListener("click", () => {
     else {
       values.push(scoreInt);
     }
-    // color
-    const color = document.getElementById("2").value;
-    values.push(color);
+    // color q. 2
+    const colorDiv = document.getElementById("color-options");
+    const colorRadio = colorDiv.querySelector("input[type=\"radio\"]:checked")
+    if (colorRadio == null) {
+      err.textContent = "Missing answer in statement 2";
+      return;
+    }
+    else {
+      values.push(colorRadio.value);
+    }
     // values from likerts    
     const likertContainers = document.querySelectorAll(".likertContainer")
     for (let i = 0; i < likertContainers.length; i++) {
@@ -87,12 +118,12 @@ button.addEventListener("click", () => {
         const selected = container.querySelector("input[type=\"radio\"]:checked")
 
         if (selected == null) {
-            err.textContent = `Missing answer in statement ${id}`
-            return
+            err.textContent = `Missing answer in statement ${id}`;
+            return;
         }
         else {
           const likertSelectedValue = selected.value;
-          values.push(likertSelectedValue)
+          values.push(likertSelectedValue);
         }
     }
     // opinion
@@ -106,5 +137,5 @@ button.addEventListener("click", () => {
     }
     network.JsonData.addQA(keys,values);
     network.JsonData.storeData(url);
-    // window.location.href = "index.html";
+    window.location.href = "end.html";
 });
