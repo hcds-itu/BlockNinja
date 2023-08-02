@@ -84,6 +84,11 @@ createLikertScale("likertContainer", likertLabels);
 
 // Submitting data
 
+//(delay)
+function delay(time) {
+  return new Promise(resolve => setTimeout(resolve, time));
+}
+
 const button = document.getElementById("submit");
 const err = document.getElementById("errorNotice");
 
@@ -138,5 +143,5 @@ button.addEventListener("click", () => {
     network.JsonData.addQA(keys,values);
     const returnJson = network.JsonData.storeData(url);
     console.log(returnJson)
-    delay(2000).then(() => window.location.href = "end.html");
+    delay(500).then(() => window.location.href = "end.html");
 });
