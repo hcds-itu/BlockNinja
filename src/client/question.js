@@ -106,5 +106,5 @@ button.addEventListener("click", () => {
     }
     network.JsonData.addQA(keys,values);
     network.JsonData.storeData(url);
-    window.location.href = "index.html";
+    // window.location.href = "index.html";
 });

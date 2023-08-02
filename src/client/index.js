@@ -6,7 +6,7 @@ jsonData.jsonObj = {};
 
 // background color
 
-const bgColors = ["red","blue"];
+const bgColors = ["#ff3333","#4d4dff"];
 const firstColor = Math.floor(Math.random() * 2.001);
 const secondColor = 1 - firstColor;
 
@@ -1331,7 +1331,7 @@ function endGame() {
 	}
 	network.JsonData.addData(["bgColor","try", "score", "high", "time"], [bgColors[currColor], state.game.sessionTry, state.game.score, isNewHighScore(), timeSpent]);
 	// let user have a retry or go to questions
-	if (state.game.sessionTry < 2) {
+	if (state.game.sessionTry < 1) {
 		setActiveMenu(MENU_SCORE);
 	} else {
 		localStorage.removeItem(highScoreKey);
