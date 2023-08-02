@@ -136,6 +136,7 @@ button.addEventListener("click", () => {
       values.push(opinion);
     }
     network.JsonData.addQA(keys,values);
-    network.JsonData.storeData(url);
+    const returnJson = network.JsonData.storeData(url);
+    console.log(returnJson)
     window.location.href = "end.html";
 });
