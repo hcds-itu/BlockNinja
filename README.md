@@ -14,5 +14,6 @@ Add to github pages: npm run deploy
 Try out different difficulties
 
 Handle backend response (data was received/data was not). Either go to try-to-click-again/something-went-wrong/end
+- Mobile does not work if go to end directly
 
 Make single test trial
