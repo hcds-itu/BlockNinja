@@ -138,5 +138,5 @@ button.addEventListener("click", () => {
     network.JsonData.addQA(keys,values);
     const returnJson = network.JsonData.storeData(url);
     console.log(returnJson)
-    delay(800).then(() => window.location.href = "end.html");
+    delay(2000).then(() => window.location.href = "end.html");
 });
