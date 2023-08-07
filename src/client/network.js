@@ -7,6 +7,7 @@ class JsonData {
     }
 
     static addData(keys, values) {
+        console.log(values);
         // set first indicators
         let keyColor = values[0];
         let gameTry = values[1].toString();

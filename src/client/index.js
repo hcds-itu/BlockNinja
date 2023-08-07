@@ -12,7 +12,10 @@ const secondColor = 1 - firstColor;
 
 let currColor = firstColor
 
-document.body.style.backgroundColor = bgColors[currColor];
+let trial = true;
+const trialColor = "#baa8cf"
+
+document.body.style.backgroundColor = trialColor;
 
 let startTime;
 let endTime;
@@ -27,7 +30,7 @@ let second = 0;
 // Most of this should be configuration.
 
 // Timing multiplier for entire game engine.
-let gameSpeed = 1;
+let gameSpeed = 2;
 
 // Colors
 const BLUE =   { r: 0x67, g: 0xd7, b: 0xf0 };
@@ -38,9 +41,9 @@ const allColors = [BLUE, GREEN, PINK, ORANGE];
 
 // Gameplay
 const getSpawnDelay = () => {
-	const spawnDelayMax = 800;
-	const spawnDelayMin = 450;
-	const spawnDelay = spawnDelayMax - state.game.cubeCount * 2.8;
+	const spawnDelayMax = 500;
+	const spawnDelayMin = 300;
+	const spawnDelay = spawnDelayMax - state.game.cubeCount * 3.3;
 	return Math.max(spawnDelay, spawnDelayMin);
 }
 const doubleStrongEnableScore = 2000;
@@ -55,13 +58,17 @@ let pointerScreen = { x: 0, y: 0 };
 // Same as `pointerScreen`, but converted to scene coordinates in rAF.
 let pointerScene = { x: 0, y: 0 };
 // Minimum speed of pointer before "hits" are counted.
-const minPointerSpeed = 5;
+const minPointerSpeed = 15;
+// Stroke has been intiated
+let strokeBegin = false;
+// Number of strokes
+let strokeCount = 0;
 // The hit speed affects the direction the target post-hit. This number dampens that force.
 const hitDampening = 0.1;
 // Backboard receives shadows and is the farthest negative Z position of entities.
 const backboardZ = -400;
 // How much air drag is applied to standard objects
-const airDrag = 0.022;
+const airDrag = 0.01;
 const gravity = 0.3;
 // Spark config
 const sparkColor = 'rgba(170,221,255,.9)';
@@ -1320,29 +1327,39 @@ function resetGame() {
 }
 
 function endGame() {
-	endTime = performance.now();
-	timeSpent = (endTime - startTime)/1000;
-
-	state.game.sessionTry += 1;
-
-	handleCanvasPointerUp();
-	if (isNewHighScore()) {
-		setHighScore(state.game.score);
-	}
-	network.JsonData.addData(["bgColor","try", "score", "high", "time"], [bgColors[currColor], state.game.sessionTry, state.game.score, isNewHighScore(), timeSpent]);
-	// let user have a retry or go to questions
-	if (state.game.sessionTry < 1) {
+	if (trial) {
+		trial = false;
+		document.body.style.backgroundColor = bgColors[currColor];
 		setActiveMenu(MENU_SCORE);
 	} else {
-		localStorage.removeItem(highScoreKey);
-		_lastHighscore = -1;
-		if (currColor == secondColor) {
-			setActiveMenu(MENU_DONE);
-		} else {
-			state.game.sessionTry = 0;
-			currColor = secondColor
-			document.body.style.backgroundColor = bgColors[currColor];
+		endTime = performance.now();
+		timeSpent = (endTime - startTime)/1000;
+
+		state.game.sessionTry += 1;
+
+		handleCanvasPointerUp();
+		if (isNewHighScore()) {
+			setHighScore(state.game.score);
+		}
+		network.JsonData.addData(["bgColor","try", "score", "high", "time", "strokes"], 
+								[bgColors[currColor], state.game.sessionTry, state.game.score, isNewHighScore(), timeSpent, strokeCount]);
+		strokeCount = 0;
+		strokeBegin = false;
+		// let user have a retry or go to questions
+		if (state.game.sessionTry < 1) {
 			setActiveMenu(MENU_SCORE);
+		} else {
+			localStorage.removeItem(highScoreKey);
+			_lastHighscore = -1;
+			if (currColor == secondColor) {
+				console.log("hej")
+				setActiveMenu(MENU_DONE);
+			} else {
+				state.game.sessionTry = 0;
+				currColor = secondColor
+				document.body.style.backgroundColor = bgColors[currColor];
+				setActiveMenu(MENU_SCORE);
+			}
 		}
 	}
 }
@@ -1359,7 +1376,7 @@ const pointerDeltaScaled = { x: 0, y: 0 };
 
 let spawnExtra = 0;
 const spawnExtraDelay = 250;
-let targetSpeed = 1;
+let targetSpeed = 20;
 
 
 function tick(width, height, simTime, simSpeed, lag) {
@@ -1423,6 +1440,15 @@ function tick(width, height, simTime, simSpeed, lag) {
 	}
 	const pointerSpeed = Math.hypot(pointerDelta.x, pointerDelta.y);
 	const pointerSpeedScaled = pointerSpeed * forceMultiplier;
+
+	if (pointerSpeedScaled > minPointerSpeed && !strokeBegin) {
+		strokeBegin = true;
+	} 
+	if (strokeBegin && pointerSpeedScaled < 1) {
+		console.log("+1")
+		strokeCount += 1;
+		strokeBegin = false;
+	}
 
 	// Track points for later calculations, including drawing trail.
 	touchPoints.forEach(p => p.life -= simTime);
