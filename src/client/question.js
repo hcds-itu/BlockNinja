@@ -87,7 +87,7 @@ createLikertScale("likertContainer", likertLabels);
 const button = document.getElementById("submit");
 const err = document.getElementById("errorNotice");
 
-button.addEventListener("click", () => {
+button.addEventListener("click", async () => {
     let keys = [1,2,3,4,5,6,7];
     let values = [];
     // score
@@ -136,6 +136,10 @@ button.addEventListener("click", () => {
       values.push(opinion);
     }
     network.JsonData.addQA(keys,values);
-    const returnJson = network.JsonData.storeData(url);
-    window.location.href= "end.html";
+    try {
+      const returnJson = await network.JsonData.storeData(url);
+      window.location.href = "end.html";
+    } catch (error) {
+      console.error('Error:', error);
+    }
 });

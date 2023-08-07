@@ -40,7 +40,7 @@ class JsonData {
                 "Content-Type": "application/json"
             },
         });
-        return await response;
+        return response.json;
     }
 }
 
