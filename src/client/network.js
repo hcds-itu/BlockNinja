@@ -31,28 +31,17 @@ class JsonData {
         }
     }
 
-    static storeData(url) {
-        fetch(url + "/store_data", {
+    static async storeData(url) {
+        const response = await fetch(url + "/store_data", {
             method: "POST",
             body: JSON.stringify(JsonData.jsonObj),
             headers: {
                 "Accept": "application/json",
                 "Content-Type": "application/json"
             },
-        })
-        .then((response) => {
-            if (!response.ok) {
-            throw new Error("Network response was not ok");
-            }
-            return response.json();
-        })
-        .then((data) => {
-            console.log(data);
-        })
-        .catch((error) => {
-            console.error("Error during fetch:", error);
         });
-    }   
+        return await response;
+    }
 }
 
 module.exports = {
