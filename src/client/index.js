@@ -6,13 +6,17 @@ jsonData.jsonObj = {};
 
 // background color
 
-const bgColors = ["#ff3333","#4d4dff"];
+const bgColors = ["#63C5DA","#D0312D"];
+const namesColors = ["BLUE", "RED"]
 const firstColor = Math.floor(Math.random() * 2.001);
 const secondColor = 1 - firstColor;
 
+// first color to play with when game starts
 let currColor = firstColor
 
-let trial = true;
+// the color used during trial run
+let trial = false;
+let trialTimer = 60;
 const trialColor = "#baa8cf"
 
 document.body.style.backgroundColor = trialColor;
@@ -1156,9 +1160,6 @@ function returnSpark(spark) {
 }
 
 
-
-
-
 // hud.js
 const hudContainerNode = $('.hud');
 
@@ -1169,21 +1170,6 @@ function setHudVisibility(visible) {
 		hudContainerNode.style.display = 'none';
 	}
 }
-
-
-///////////
-// Score //
-///////////
-
-
-//////////////////
-// Pause Button //
-//////////////////
-
-
-////////////////////
-// Slow-Mo Status //
-////////////////////
 
 // menus.js
 // Top-level menu containers
@@ -1205,7 +1191,6 @@ function renderMenus() {
 	hideMenu(menuMainNode);
 	hideMenu(menuScoreNode);
 	hideMenu(menuDoneNode);
-
 	switch (state.menus.active) {
 		case MENU_MAIN:
 			showMenu(menuMainNode);
@@ -1226,15 +1211,13 @@ function renderMenus() {
 renderMenus();
 
 
-
-
-
 ////////////////////
 // Button Actions //
 ////////////////////
 
 // Main Menu
 handleClick($('.play-normal-btn'), () => {
+	trial = true;
 	startTime = performance.now()
 	setGameMode(GAME_MODE_RANKED);
 	setActiveMenu(null);
@@ -1243,6 +1226,8 @@ handleClick($('.play-normal-btn'), () => {
 
 // Score Menu
 handleClick($('.play-again-btn'), () => {
+	strokeCount = 0;
+	strokeBegin = false;
 	startTime = performance.now();
 	setActiveMenu(null);
 	resetGame();
@@ -1251,20 +1236,6 @@ handleClick($('.play-again-btn'), () => {
 ////////////////////
 // Button Actions //
 ////////////////////
-
-// Main Menu
-handleClick($('.play-normal-btn'), () => {
-	setGameMode(GAME_MODE_RANKED);
-	setActiveMenu(null);
-	resetGame();
-});
-
-// Score Menu
-handleClick($('.play-again-btn'), () => {
-	setActiveMenu(null);
-	resetGame();
-});
-
 
 // actions.js
 //////////////////
@@ -1328,8 +1299,6 @@ function resetGame() {
 
 function endGame() {
 	if (trial) {
-		trial = false;
-		document.body.style.backgroundColor = bgColors[currColor];
 		setActiveMenu(MENU_SCORE);
 	} else {
 		endTime = performance.now();
@@ -1342,23 +1311,23 @@ function endGame() {
 			setHighScore(state.game.score);
 		}
 		network.JsonData.addData(["bgColor","try", "score", "high", "time", "strokes"], 
-								[bgColors[currColor], state.game.sessionTry, state.game.score, isNewHighScore(), timeSpent, strokeCount]);
+								[namesColors[currColor], state.game.sessionTry, state.game.score, isNewHighScore(), timeSpent, strokeCount]);
 		strokeCount = 0;
 		strokeBegin = false;
 		// let user have a retry or go to questions
-		if (state.game.sessionTry < 1) {
+		if (state.game.sessionTry < 5) {
 			setActiveMenu(MENU_SCORE);
 		} else {
 			localStorage.removeItem(highScoreKey);
 			_lastHighscore = -1;
 			if (currColor == secondColor) {
-				console.log("hej")
 				setActiveMenu(MENU_DONE);
 			} else {
 				state.game.sessionTry = 0;
 				currColor = secondColor
 				document.body.style.backgroundColor = bgColors[currColor];
 				setActiveMenu(MENU_SCORE);
+				document.getElementById("menu-score").textContent = namesColors[currColor] + " BACKGROUND"
 			}
 		}
 	}
@@ -1445,7 +1414,6 @@ function tick(width, height, simTime, simSpeed, lag) {
 		strokeBegin = true;
 	} 
 	if (strokeBegin && pointerSpeedScaled < 1) {
-		console.log("+1")
 		strokeCount += 1;
 		strokeBegin = false;
 	}
@@ -1812,6 +1780,9 @@ function draw(ctx, width, height, viewScale) {
 // canvas.js
 function setupCanvas() {
 	const ctx = canvas.getContext('2d');
+	// draw timer
+    let timerValue = 0;
+
 	// devicePixelRatio alias
 	const dpr = window.devicePixelRatio || 1;
 	// View will be scaled so objects appear sized similarly on all screen sizes.
@@ -1869,12 +1840,26 @@ function setupCanvas() {
 
 		// Auto clear canvas
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		// Auto scale drawing for high res displays, and incorporate `viewScale`.
-		// Also shift canvas so (0, 0) is the middle of the screen.
-		// This just works with 3D perspective projection.
 		const drawScale = dpr * viewScale;
 		ctx.scale(drawScale, drawScale);
 		ctx.translate(halfW, halfH);
+
+		// timer increment
+		if (trial) {
+			timerValue += simTime;
+		}
+		if (timerValue/1000 < trialTimer) {
+			// Draw the timer or updated text
+			ctx.fillStyle = "white";
+			ctx.font = "20px Arial";
+			ctx.fillText("Trial Time: " + (trialTimer - Math.ceil(timerValue/1000)), -halfW + 20, -halfH + 40);
+		} else if (trial) {
+			setActiveMenu(MENU_SCORE);
+			document.body.style.backgroundColor = bgColors[currColor];
+			trial = false;
+			document.getElementById("menu-score").textContent = namesColors[currColor] + " BACKGROUND"
+		}
+
 		draw(ctx, width, height, viewScale);
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 	}
